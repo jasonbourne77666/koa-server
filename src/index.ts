@@ -1,10 +1,15 @@
 import Koa from 'koa';
 import path from 'path';
 import staticCache from 'koa-static-cache';
+import winston from 'winston';
 import { config } from './config/config';
+import { logger } from './logger';
 import { unprotectedRouter } from './routes/unprotectedRoutes';
 import { protectedRouter } from './routes/protectedRouter';
 const app = new Koa();
+
+// Logger middleware -> use winston as logger (logging.ts with config)
+app.use(logger(winston));
 
 app.use(
   staticCache(path.join(__dirname, '../public'), {
