@@ -6,6 +6,7 @@ const unprotectedRouter = new Router();
 // 一般路由，非token鉴权
 // user
 unprotectedRouter.post('/register', user.register);
+unprotectedRouter.post('/login', user.login);
 
 // unprotectedRouter.get('/', general.helloWorld);
 unprotectedRouter.get('/banner', general.getBanner);

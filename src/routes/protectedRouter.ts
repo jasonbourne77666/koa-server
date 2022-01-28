@@ -4,8 +4,8 @@ import { user } from '../controller';
 const protectedRouter = new SwaggerRouter();
 
 // USER ROUTES
-protectedRouter.post('/create-users', user.createUser);
-protectedRouter.get('/get-user', user.getAllUsers);
+// protectedRouter.post('/create-users', user.createUser);
+protectedRouter.get('/get-userinfo', user.getUserInfo);
 
 // Swagger endpoint
 protectedRouter.swagger({

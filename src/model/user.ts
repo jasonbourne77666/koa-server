@@ -10,6 +10,18 @@ import {
   IsMobilePhone
 } from 'class-validator';
 
+export class validatorLogin {
+  @Length(6, 12, {
+    message: '用户名长度6-12位'
+  })
+  username!: string;
+
+  @Length(6, 12, {
+    message: '密码长度6-12位'
+  })
+  password!: string;
+}
+
 export class validatorUser {
   @Length(6, 12, {
     message: '用户名长度6-12位'
@@ -135,7 +147,7 @@ export const userSchema = {
 
 //创建表，默认是false，true则是删除原有表，再创建
 User.sync({
-  force: true
+  force: false
 });
 
 export default User;
