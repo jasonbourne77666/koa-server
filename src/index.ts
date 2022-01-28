@@ -5,6 +5,7 @@ import winston from 'winston';
 import helmet from 'koa-helmet';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
+import { cron } from './config/cron';
 import 'reflect-metadata';
 
 import { config } from './config/config';
@@ -53,5 +54,8 @@ app.use(protectedRouter.routes()).use(unprotectedRouter.allowedMethods());
 // app.use(async (ctx) => {
 //   ctx.body = { name: 'Hello World 1' };
 // });
+
+// Register cron job to do any action needed
+cron.start();
 
 app.listen(config.port);
