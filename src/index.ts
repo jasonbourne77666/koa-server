@@ -3,14 +3,15 @@ import path from 'path';
 import staticCache from 'koa-static-cache';
 import winston from 'winston';
 import helmet from 'koa-helmet';
+import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
+import 'reflect-metadata';
+
 import { config } from './config/config';
 import { logger } from './logger';
 import { unprotectedRouter } from './routes/unprotectedRoutes';
 import { protectedRouter } from './routes/protectedRouter';
 const app = new Koa();
-
-// Logger middleware -> use winston as logger (logging.ts with config)
-app.use(logger(winston));
 
 // Provides important security headers to make your app more secure
 app.use(
@@ -29,6 +30,15 @@ app.use(
     }
   })
 );
+
+// Enable cors with default options
+app.use(cors());
+
+// Logger middleware -> use winston as logger (logging.ts with config)
+app.use(logger(winston));
+
+// Enable bodyParser with default options
+app.use(bodyParser());
 
 app.use(
   staticCache(path.join(__dirname, '../public'), {
