@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/koa": "^2.13.4",
+    "@types/koa-helmet": "^6.0.4",
     "@types/koa-static-cache": "^5.1.1",
     "@types/sequelize": "^4.28.11",
     "@types/winston": "^2.4.4",
@@ -26,6 +27,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^14.3.2",
     "koa": "^2.13.4",
+    "koa-helmet": "^6.1.0",
     "koa-static-cache": "^5.1.4",
     "koa-swagger-decorator": "^1.8.2",
     "mysql2": "^2.3.3",

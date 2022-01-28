@@ -2,6 +2,7 @@ import Koa from 'koa';
 import path from 'path';
 import staticCache from 'koa-static-cache';
 import winston from 'winston';
+import helmet from 'koa-helmet';
 import { config } from './config/config';
 import { logger } from './logger';
 import { unprotectedRouter } from './routes/unprotectedRoutes';
@@ -10,6 +11,24 @@ const app = new Koa();
 
 // Logger middleware -> use winston as logger (logging.ts with config)
 app.use(logger(winston));
+
+// Provides important security headers to make your app more secure
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        'cdnjs.cloudflare.com',
+        'fonts.googleapis.com'
+      ],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'online.swagger.io', 'validator.swagger.io']
+    }
+  })
+);
 
 app.use(
   staticCache(path.join(__dirname, '../public'), {
