@@ -1,13 +1,12 @@
 import { Context } from 'koa';
+import * as path from 'path';
 import { config } from './config/config';
 import { transports, format } from 'winston';
-import * as path from 'path';
 
 const logger = (winstonInstance: any): any => {
   winstonInstance.configure({
     level: config.debugLogging ? 'debug' : 'info',
     transports: [
-      //
       // - Write all logs error (and below) to `error.log`.
       new transports.File({
         filename: path.resolve(__dirname, '../error.log'),
@@ -40,7 +39,9 @@ const logger = (winstonInstance: any): any => {
       logLevel = 'info';
     }
 
-    const msg = `${ctx.method} ${ctx.originalUrl} ${ctx.status} ${ms}ms`;
+    const msg = `${ctx.method} ${ctx.originalUrl} ${
+      ctx.status
+    } ${ms}ms ${new Date()}`;
 
     winstonInstance.log(logLevel, msg);
   };

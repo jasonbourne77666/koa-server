@@ -1,6 +1,9 @@
 import { Context, Next } from 'koa';
-
-import User from '../model/user';
+import { validateOrReject, ValidationError } from 'class-validator';
+import { resJson } from '../utils/resJson';
+import { getErrorMsg } from '../utils/utils';
+import { ParameterException, HttpException } from '../utils/http-exception';
+import User, { userSchema, validatorUser } from '../model/user';
 
 import {
   description,
@@ -13,6 +16,45 @@ import {
 
 @tagsAll(['User'])
 export default class UserController {
+  /**
+   * 注册
+   */
+  @request('post', '/register')
+  @summary('register user')
+  @body(userSchema)
+  public static async register(ctx: Context): Promise<void> {
+    try {
+      const { username, password, email, phone, birth, sex } = ctx.request.body;
+      const body = new validatorUser();
+      body.username = username;
+      body.password = password;
+      body.email = email;
+      body.phone = phone;
+      body.birth = birth;
+      body.sex = sex;
+
+      const result = await validateOrReject(body);
+
+      if (Array.isArray(result) && result.length) {
+        const msg = getErrorMsg(result[0]);
+        throw new ParameterException(msg);
+      }
+
+      const user = User.build({
+        ...body
+      });
+      await user.save();
+
+      ctx.body = resJson.success({ msg: '注册成功!' });
+    } catch (error: any) {
+      let msg = error.message;
+      if (Array.isArray(error) && error.length) {
+        msg = getErrorMsg(error[0]);
+      }
+      throw new ParameterException(msg);
+    }
+  }
+
   @request('get', 'getAllUsers')
   @summary('get All Users')
   public static async getAllUsers(ctx: Context): Promise<void> {
