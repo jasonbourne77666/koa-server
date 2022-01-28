@@ -1,11 +1,11 @@
-//db.js
+//db
 import { Sequelize } from 'sequelize';
 const db = {
-  database: 'demo', // 使用哪个数据库
-  username: 'root', // 用户名
-  password: 'qwe123', // 口令
-  host: 'localhost', // 主机名
-  port: 3306 // 端口号，MySQL默认3306
+  database: process.env.DATABASE || '', // 使用哪个数据库
+  username: process.env.DATABASE_USER || '', // 用户名
+  password: process.env.DATABASE_PASS, // 口令
+  host: process.env.DATABASE_URL, // 主机名
+  port: process.env.DATABASE_PORT // 端口号，MySQL默认3306
 };
 const sequelize = new Sequelize(db.database, db.username, db.password, {
   host: db.host,
@@ -20,7 +20,7 @@ const sequelize = new Sequelize(db.database, db.username, db.password, {
   pool: {
     max: 5, // 连接池最大链接数量
     min: 0, // 最小连接数量
-    idle: 10000 // 如果一个线程10秒内没有被使用的花，就释放连接池
+    idle: 10000 // 如果一个线程10秒内没有被使用的话，就释放连接池
   },
   timezone: '+08:00', // 东八时区
   logging: (log) => {

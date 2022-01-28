@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import path from 'path';
 import staticCache from 'koa-static-cache';
+import { config } from './config/config';
 import { unprotectedRouter } from './routes/unprotectedRoutes';
 import { protectedRouter } from './routes/protectedRouter';
 const app = new Koa();
@@ -19,4 +20,4 @@ app.use(protectedRouter.routes()).use(unprotectedRouter.allowedMethods());
 //   ctx.body = { name: 'Hello World 1' };
 // });
 
-app.listen(3000);
+app.listen(config.port);

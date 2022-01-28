@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "tsc dist/index.ts",
-    "dev": "nodemon --watch src -e ts,tsx --exec ts-node src/index.ts"
+    "build": "cross-env NODE_ENV=production tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src -e ts,tsx --exec ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/koa": "^2.13.4",
     "@types/koa-static-cache": "^5.1.1",
     "@types/sequelize": "^4.28.11",
@@ -21,6 +22,8 @@
   },
   "dependencies": {
     "@koa/router": "^10.1.1",
+    "cross-env": "^7.0.3",
+    "dotenv": "^14.3.2",
     "koa": "^2.13.4",
     "koa-static-cache": "^5.1.4",
     "koa-swagger-decorator": "^1.8.2",
