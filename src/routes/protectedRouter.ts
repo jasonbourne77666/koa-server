@@ -5,7 +5,7 @@ const protectedRouter = new SwaggerRouter();
 
 // USER ROUTES
 // protectedRouter.post('/create-users', user.createUser);
-protectedRouter.get('/get-userinfo', user.getUserInfo);
+protectedRouter.post('/get-userinfo', user.getUserInfo);
 
 // Swagger endpoint
 protectedRouter.swagger({

@@ -146,8 +146,8 @@ export const userSchema = {
 };
 
 //创建表，默认是false，true则是删除原有表，再创建
-User.sync({
-  force: false
-});
+// User.sync({
+//   force: false
+// });
 
 export default User;

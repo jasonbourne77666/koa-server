@@ -1,7 +1,9 @@
 // middleware/exception.js
 import { Context, Next } from 'koa';
-import { HttpException, ParameterException } from '../utils/http-exception';
+import {} from 'koa-jwt';
+import { HttpException, AuthFailed } from '../utils/http-exception';
 import { resJson } from '../utils/resJson';
+import { HttpStatus } from '../config/httpStatus';
 
 // 全局异常监听
 export const catchError = async (ctx: Context, next: Next) => {
@@ -10,6 +12,8 @@ export const catchError = async (ctx: Context, next: Next) => {
   } catch (error: any) {
     // 已知异常
     const isHttpException = error instanceof HttpException;
+    // 401验证异常
+    const { status } = error;
     // 开发环境
     const isDev = process.env.NODE_ENV === 'development';
 
@@ -26,13 +30,18 @@ export const catchError = async (ctx: Context, next: Next) => {
      */
     if (isHttpException) {
       ctx.body = resJson.fail(error);
-      ctx.response.status = 200;
+      // ctx.response.status = 200;
+    } else if (status === HttpStatus.AUTHFAILED) {
+      // 验证失败，需要token权限
+      ctx.body = resJson.fail(new AuthFailed('登陆失效'));
+      // ctx.response.status = 200;
     } else {
+      console.log('error', error);
       ctx.body = resJson.fail({
         msg: '未知错误',
-        error_code: 9999
+        code: 9999
       });
-      ctx.response.status = 500;
+      // ctx.response.status = 200;
     }
   }
 };

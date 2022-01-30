@@ -1,6 +1,9 @@
 import { Context, Next } from 'koa';
 import { validateOrReject, validate } from 'class-validator';
+import jwt from 'jsonwebtoken';
 import { resJson } from '../utils/resJson';
+import { config } from '../config/config';
+import { HttpStatus } from '../config/httpStatus';
 import { getErrorMsg } from '../utils/utils';
 import { ParameterException, HttpException } from '../utils/http-exception';
 import User, { userSchema, validatorUser, validatorLogin } from '../model/user';
@@ -44,8 +47,7 @@ export default class UserController {
     // 检查是否重复
     const findUser = await UserController.getUser(body.username);
     if (findUser) {
-      ctx.body = resJson.success({ msg: '用户名已存在!', code: 203 });
-      return;
+      throw new ParameterException('用户名已存在!');
     }
 
     const user = User.build({
@@ -74,10 +76,13 @@ export default class UserController {
     return result;
   }
 
+  /**
+   * 获取用户信息
+   */
   @request('get', 'getUserInfo')
   @summary('get user info by id')
   public static async getUserInfo(ctx: Context): Promise<void> {
-    const username = ctx.request.body;
+    const { username } = ctx.request.body;
     const findUser = await UserController.getUser(username);
     if (findUser) {
       ctx.body = resJson.success({ msg: '请求成功!', data: findUser });
@@ -102,24 +107,22 @@ export default class UserController {
 
     // 检查密码
     const findUser: any = await UserController.getUser(body.username, true);
-    if (!findUser) {
-      ctx.body = resJson.success({
-        msg: '用户名不存在!',
-        code: 205
+    // if (!findUser) {
+    //   throw new ParameterException('用户名不存在!');
+    // } else
+    if (findUser && findUser.password === body.password) {
+      const { password, id, ...userinfo } = findUser;
+      const token = jwt.sign({ ...userSchema }, config.jwtSecret, {
+        expiresIn: '1h'
       });
-      return;
-    } else if (findUser && findUser.password === body.password) {
       ctx.body = resJson.success({
         msg: '登陆成功!',
-        code: 200,
-        data: findUser
+        code: HttpStatus.SUCCESS,
+        data: { ...userinfo, token }
       });
       return;
     }
 
-    ctx.body = resJson.success({
-      msg: '用户名或密码错误!',
-      code: 205
-    });
+    throw new ParameterException('用户名或密码错误!');
   }
 }
