@@ -6,7 +6,7 @@ import { resJson } from '../utils/resJson';
 import { config } from '../config/config';
 import { HttpStatus } from '../config/httpStatus';
 import { getErrorMsg } from '../utils/utils';
-import { ParameterException, HttpException } from '../utils/http-exception';
+import { ParameterException, AuthFailed } from '../utils/http-exception';
 import User, { userSchema, validatorUser, validatorLogin } from '../model/user';
 
 import {
@@ -38,6 +38,7 @@ export default class UserController {
     body.phone = phone;
     body.birth = birth;
     body.sex = sex;
+    body.captcha = captcha;
 
     try {
       const result = await validateOrReject(body);
@@ -49,7 +50,7 @@ export default class UserController {
       throw new ParameterException(msg);
     }
 
-    if (sessionCaptcha !== captcha) {
+    if (sessionCaptcha.toLocaleLowerCase() !== captcha.toLocaleLowerCase()) {
       throw new ParameterException('验证码不正确');
     }
 
@@ -63,7 +64,13 @@ export default class UserController {
       ...body
     });
     const userInfo = await user.save();
-    ctx.body = resJson.success({ msg: '注册成功!', data: userInfo });
+    const token = jwt.sign({ ...userInfo }, config.jwtSecret, {
+      expiresIn: '1h'
+    });
+    ctx.body = resJson.success({
+      msg: '注册成功!',
+      data: { ...userInfo, token }
+    });
   }
 
   /**
@@ -91,7 +98,17 @@ export default class UserController {
   @request('get', 'getUserInfo')
   @summary('get user info by id')
   public static async getUserInfo(ctx: Context): Promise<void> {
-    const { username } = ctx.request.body;
+    let authorization = ctx.request.headers?.authorization ?? '';
+    authorization = (authorization as string).split('Bearer ')[1];
+    const userinfo = jwt.decode(authorization);
+    let username;
+    if (userinfo) {
+      username = (userinfo as any).username || '';
+    }
+
+    if (!userinfo || !username) {
+      throw new AuthFailed();
+    }
     const findUser = await UserController.getUser(username);
     if (findUser) {
       ctx.body = resJson.success({ msg: '请求成功!', data: findUser });
@@ -120,7 +137,7 @@ export default class UserController {
       throw new ParameterException(msg);
     }
 
-    if (sessionCaptcha !== captcha) {
+    if (sessionCaptcha.toLocaleLowerCase() !== captcha.toLocaleLowerCase()) {
       throw new ParameterException('验证码不正确');
     }
 
@@ -131,7 +148,7 @@ export default class UserController {
     // } else
     if (findUser && findUser.password === body.password) {
       const { password, id, ...userinfo } = findUser;
-      const token = jwt.sign({ ...userSchema }, config.jwtSecret, {
+      const token = jwt.sign({ ...userinfo }, config.jwtSecret, {
         expiresIn: '1h'
       });
       ctx.body = resJson.success({
@@ -158,6 +175,7 @@ export default class UserController {
     });
     // ctx.response.sess;
     ctx.session!.captcha = captcha.text;
+    console.log('ctx.session!.captcha', ctx.session!.captcha);
     ctx.type = 'image/svg+xml';
     ctx.body = captcha.data;
   }

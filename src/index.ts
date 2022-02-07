@@ -43,7 +43,8 @@ app.use(
 );
 
 // Enable cors with default options
-app.use(cors());
+// credentials 解决浏览器访问跨域不携带session
+app.use(cors({ credentials: true }));
 
 // Enable bodyParser with default options
 app.use(bodyParser());
@@ -64,7 +65,7 @@ app.use(unprotectedRouter.routes()).use(unprotectedRouter.allowedMethods());
 app.use(jwt({ secret: config.jwtSecret }).unless({ path: [/^\/swagger-/] }));
 
 // these routes are protected by the JWT middleware, also include middleware to respond with "Method Not Allowed - 405".
-app.use(protectedRouter.routes()).use(unprotectedRouter.allowedMethods());
+app.use(protectedRouter.routes()).use(protectedRouter.allowedMethods());
 
 // Register cron job to do any action needed
 cron.start();
