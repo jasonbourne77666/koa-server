@@ -20,6 +20,11 @@ export class validatorLogin {
     message: '密码长度6-12位'
   })
   password!: string;
+
+  @Length(4, 6, {
+    message: '验证码不正确'
+  })
+  captcha!: string;
 }
 
 export class validatorUser {
@@ -35,6 +40,11 @@ export class validatorUser {
 
   @IsEmail({}, { message: '请输入正确的邮箱' })
   email!: string;
+
+  @Length(4, 6, {
+    message: '验证码不正确'
+  })
+  captcha!: string;
 
   @IsMobilePhone()
   @Length(11, 11, {

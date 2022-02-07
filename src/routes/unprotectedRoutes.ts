@@ -7,6 +7,7 @@ const unprotectedRouter = new Router();
 // user
 unprotectedRouter.post('/register', user.register);
 unprotectedRouter.post('/login', user.login);
+unprotectedRouter.get('/captcha', user.captcha);
 
 // unprotectedRouter.get('/', general.helloWorld);
 unprotectedRouter.get('/banner', general.getBanner);

@@ -5,10 +5,11 @@ import winston from 'winston';
 import helmet from 'koa-helmet';
 import jwt from 'koa-jwt';
 import bodyParser from 'koa-bodyparser';
+import session from 'koa-session';
 import cors from '@koa/cors';
 import 'reflect-metadata';
 
-import { config } from './config/config';
+import { config, SessionConfig } from './config/config';
 import { logger } from './logger';
 import { unprotectedRouter } from './routes/unprotectedRoutes';
 import { protectedRouter } from './routes/protectedRouter';
@@ -16,7 +17,7 @@ import { cron } from './config/cron';
 import { catchError } from './middleware/exception';
 
 const app = new Koa();
-
+app.keys = [config.jwtSecret];
 // Logger middleware -> use winston as logger (logging.ts with config)
 app.use(logger(winston));
 
@@ -53,6 +54,9 @@ app.use(
   })
 );
 
+app.use(session({ maxAge: 1000 * 1000 }, app));
+// or if you prefer all default config, just use => app.use(session(app));
+
 // these routes are NOT protected by the JWT middleware, also include middleware to respond with "Method Not Allowed - 405".
 app.use(unprotectedRouter.routes()).use(unprotectedRouter.allowedMethods());
 // JWT middleware -> below this line routes are only reached if JWT token is valid, secret as env variable
@@ -61,10 +65,6 @@ app.use(jwt({ secret: config.jwtSecret }).unless({ path: [/^\/swagger-/] }));
 
 // these routes are protected by the JWT middleware, also include middleware to respond with "Method Not Allowed - 405".
 app.use(protectedRouter.routes()).use(unprotectedRouter.allowedMethods());
-
-// app.use(async (ctx) => {
-//   ctx.body = { name: 'Hello World 1' };
-// });
 
 // Register cron job to do any action needed
 cron.start();

@@ -1,6 +1,7 @@
 import { Context, Next } from 'koa';
 import { validateOrReject, validate } from 'class-validator';
 import jwt from 'jsonwebtoken';
+import svgCaptcha from 'svg-captcha';
 import { resJson } from '../utils/resJson';
 import { config } from '../config/config';
 import { HttpStatus } from '../config/httpStatus';
@@ -26,7 +27,10 @@ export default class UserController {
   @summary('register user')
   @body(userSchema)
   public static async register(ctx: Context): Promise<void> {
-    const { username, password, email, phone, birth, sex } = ctx.request.body;
+    const { username, password, email, phone, birth, sex, captcha } =
+      ctx.request.body;
+    const sessionCaptcha = ctx.session?.captcha ?? '';
+
     const body = new validatorUser();
     body.username = username;
     body.password = password;
@@ -34,6 +38,7 @@ export default class UserController {
     body.phone = phone;
     body.birth = birth;
     body.sex = sex;
+
     try {
       const result = await validateOrReject(body);
     } catch (error: any) {
@@ -42,6 +47,10 @@ export default class UserController {
         msg = getErrorMsg(error[0]);
       }
       throw new ParameterException(msg);
+    }
+
+    if (sessionCaptcha !== captcha) {
+      throw new ParameterException('验证码不正确');
     }
 
     // 检查是否重复
@@ -89,11 +98,17 @@ export default class UserController {
     }
   }
 
+  /**
+   * 登陆
+   */
   public static async login(ctx: Context): Promise<void> {
-    const { username, password } = ctx.request.body;
+    const { username, password, captcha } = ctx.request.body;
+    const sessionCaptcha = ctx.session?.captcha ?? '';
+
     const body = new validatorLogin();
     body.username = username;
     body.password = password;
+    body.captcha = captcha;
 
     try {
       const result = await validateOrReject(body);
@@ -103,6 +118,10 @@ export default class UserController {
         msg = getErrorMsg(error[0]);
       }
       throw new ParameterException(msg);
+    }
+
+    if (sessionCaptcha !== captcha) {
+      throw new ParameterException('验证码不正确');
     }
 
     // 检查密码
@@ -124,5 +143,22 @@ export default class UserController {
     }
 
     throw new ParameterException('用户名或密码错误!');
+  }
+
+  /**
+   * 验证码
+   */
+  public static async captcha(ctx: Context): Promise<void> {
+    var captcha = svgCaptcha.create({
+      size: 4, //验证码个数
+      fontSize: 50, //验证码字体大小
+      width: 100, //宽度
+      height: 40,
+      background: '#cc9966' //背景大小'
+    });
+    // ctx.response.sess;
+    ctx.session!.captcha = captcha.text;
+    ctx.type = 'image/svg+xml';
+    ctx.body = captcha.data;
   }
 }
