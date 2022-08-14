@@ -13,11 +13,11 @@ export interface Config {
 const isDevMode = process.env.NODE_ENV == 'development';
 
 const config: Config = {
-  port: +(process.env.PORT || 8000),
+  port: +(process.env.PORT || 8001),
   debugLogging: isDevMode,
   dbsslconn: !isDevMode,
   jwtSecret: process.env.JWT_SECRET || 'your-secret-whatever',
-  cronJobExpression: '0 * * * *'
+  cronJobExpression: '0 * * * *',
 };
 
 const SessionConfig = {
@@ -34,7 +34,7 @@ const SessionConfig = {
     false /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */,
   renew:
     false /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/,
-  secure: true /** (boolean) secure cookie*/
+  secure: true /** (boolean) secure cookie*/,
   // sameSite: undefined
   // null /** (string) session cookie sameSite options (default null, don't set it) */
 };

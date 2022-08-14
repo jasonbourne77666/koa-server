@@ -26,7 +26,7 @@ export class AuthFailed extends HttpException {
   constructor(msg?: string) {
     super();
     this.code = 401;
-    this.msg = msg || '登陆失效';
+    this.msg = msg || '登录失效';
   }
 }
 

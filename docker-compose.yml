@@ -1,0 +1,10 @@
+version: '3.1'
+services:
+  myServer:
+    build:
+      context: . # 当前目录
+      dockerfile: Dockerfile # 基于 Dockerfile 构建
+    image: my-server
+    container_name: my-server # docker容器的名字
+    ports:
+      - 8929:8001

@@ -1,0 +1,62 @@
+version: '3.6'
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'www.gk28.top'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://www.gk28.top:8929'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+    ports:
+      - '8929:8929'
+      - '2224:22'
+    volumes:
+      - './gitlab/config:/etc/gitlab'
+      - './gitlab/logs:/var/log/gitlab'
+      - './gitlab/data:/var/opt/gitlab'
+    shm_size: '256m'
+
+  jenkins:
+    user: root # 为了避免一些权限问题 在这我使用了root
+    restart: always # 重启方式
+    image: jenkins/jenkins:lts # 指定服务所使用的镜像 在这里我选择了 LTS (长期支持)
+    container_name: jenkins # 容器名称
+    ports: # 对外暴露的端口定义
+      - 8080:8080
+      - 50000:50000
+    volumes: # 卷挂载路径
+      - /docker-files/copy-data/jenkins/jenkins_home/:/var/jenkins_home # 数据备份这是我们一开始创建的目录挂载到容器内的jenkins_home目录
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker # 这是为了我们可以在容器内使用docker命令
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+
+  mysql:
+    image: mysql:5.7 # 原镜像`mysql:5.7`
+    container_name: mysql # 容器名为'mysql'
+    restart: always # 指定容器退出后的重启策略为始终重启
+    privileged: true # 高权限，执行 mysql/init 远程访问
+    command: --default-authentication-plugin=mysql_native_password # 允许远程访问
+    volumes: # 数据卷挂载路径设置,将本机目录映射到容器目录
+      - /docker-files/copy-data/mysql/db/:/docker-entrypoint-initdb.d # 初始化mysql 远程访问用
+      - /docker-files/copy-data/mysql/conf:/etc/mysql/conf.d # 配置文件
+      - /docker-files/copy-data/mysql/logs:/logs # 挂载日志
+      - /docker-files/copy-data/mysql/data:/var/lib/mysql
+
+    environment: # 设置环境变量,相当于docker run命令中的-e
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      MYSQL_ROOT_PASSWORD: qwe123 # 设置root用户密码
+      MYSQL_DATABASE: demo
+    ports: # 映射端口
+      - 3306:3306
+
+  web-nginx:
+    image: nginx
+    volumes:
+      - /docker-files/copy-data/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '8090:80'
+    environment:
+      - NGINX_HOST=gk28.top
+      - NGINX_PORT=80

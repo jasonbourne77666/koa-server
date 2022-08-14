@@ -1,4 +1,4 @@
-import Koa from 'koa';
+import Koa, { DefaultContext, DefaultState } from 'koa';
 import path from 'path';
 import staticCache from 'koa-static-cache';
 import winston from 'winston';
@@ -16,7 +16,11 @@ import { protectedRouter } from './routes/protectedRouter';
 import { cron } from './config/cron';
 import { catchError } from './middleware/exception';
 
-const app = new Koa();
+export interface CustomContext extends DefaultContext {
+  custom?: string;
+}
+
+const app = new Koa<DefaultState, CustomContext>();
 app.keys = [config.jwtSecret];
 // Logger middleware -> use winston as logger (logging.ts with config)
 app.use(logger(winston));
@@ -30,15 +34,10 @@ app.use(
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        'cdnjs.cloudflare.com',
-        'fonts.googleapis.com'
-      ],
+      styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'fonts.googleapis.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:', 'online.swagger.io', 'validator.swagger.io']
-    }
+      imgSrc: ["'self'", 'data:', 'online.swagger.io', 'validator.swagger.io'],
+    },
   })
 );
 
@@ -54,8 +53,7 @@ app.use(
     // prefix: '/public'
   })
 );
-
-app.use(session({ maxAge: 1000 * 1000 }, app));
+app.use(session({ maxAge: 24 * 60 * 60 * 1000 }, app));
 // or if you prefer all default config, just use => app.use(session(app));
 
 // these routes are NOT protected by the JWT middleware, also include middleware to respond with "Method Not Allowed - 405".

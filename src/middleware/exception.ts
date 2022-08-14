@@ -1,6 +1,5 @@
 // middleware/exception.js
 import { Context, Next } from 'koa';
-import {} from 'koa-jwt';
 import { HttpException, AuthFailed } from '../utils/http-exception';
 import { resJson } from '../utils/resJson';
 import { HttpStatus } from '../config/httpStatus';
@@ -10,7 +9,7 @@ export const catchError = async (ctx: Context, next: Next) => {
   try {
     await next();
   } catch (error: any) {
-    // 已知异常
+    // 判断是否是主动抛出的异常
     const isHttpException = error instanceof HttpException;
     // 401验证异常
     const { status } = error;
@@ -39,7 +38,7 @@ export const catchError = async (ctx: Context, next: Next) => {
       console.log('error', error);
       ctx.body = resJson.fail({
         msg: '未知错误',
-        code: 9999
+        code: 9999,
       });
       // ctx.response.status = 200;
     }
