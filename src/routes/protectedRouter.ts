@@ -4,8 +4,7 @@ import { user } from '../controller';
 const protectedRouter = new SwaggerRouter();
 
 // USER ROUTES
-// protectedRouter.post('/create-users', user.createUser);
-protectedRouter.post('/get-userinfo', user.getUserInfo);
+protectedRouter.post('/api/get-userinfo', user.getUserInfo);
 
 // Swagger endpoint
 protectedRouter.swagger({
@@ -19,10 +18,10 @@ protectedRouter.swagger({
       api_key: {
         type: 'apiKey',
         in: 'header',
-        name: 'api_key'
-      }
-    }
-  }
+        name: 'api_key',
+      },
+    },
+  },
 });
 // mapDir will scan the input dir, and automatically call router.map to all Router Class
 protectedRouter.mapDir(__dirname);

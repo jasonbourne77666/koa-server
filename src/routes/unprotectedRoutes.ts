@@ -5,12 +5,12 @@ const unprotectedRouter = new Router();
 
 // 一般路由，非token鉴权
 // user
-unprotectedRouter.post('/register', user.register);
-unprotectedRouter.post('/login', user.login);
-unprotectedRouter.get('/captcha', user.captcha);
+unprotectedRouter.post('/api/register', user.register);
+unprotectedRouter.post('/api/login', user.login);
+unprotectedRouter.get('/api/captcha', user.captcha);
 
-// unprotectedRouter.get('/', general.helloWorld);
-unprotectedRouter.get('/banner', general.getBanner);
-unprotectedRouter.get('/banner-detail/:id', general.bannerDetail);
+// unprotectedRouter.get('/api/', general.helloWorld);
+unprotectedRouter.get('/api/banner', general.getBanner);
+unprotectedRouter.get('/api/banner-detail/:id', general.bannerDetail);
 
 export { unprotectedRouter };
