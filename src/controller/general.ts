@@ -1,4 +1,5 @@
 import { BaseContext, Context } from 'koa';
+import semver from 'semver';
 import { description, request, summary, tagsAll, path, body } from 'koa-swagger-decorator';
 import { resJson } from '../utils/resJson';
 import { HttpStatus } from '../config/httpStatus';
@@ -10,6 +11,50 @@ export default class GeneralController {
   @description('A simple welcome message to verify the service is up and running.')
   public static async helloWorld(ctx: BaseContext): Promise<void> {
     ctx.body = 'Hello World!';
+  }
+
+  @request('get', '/version')
+  @summary('get version')
+  @description('get versions for app')
+  public static async getVersion(ctx: Context): Promise<void> {
+    const latestVersion = '1.0.1';
+    // 整包更新版本
+    const allVersion = '';
+    const { appVersion: currentVersion, appid, platform } = (ctx.request.query as any) || {};
+    // 热更新
+    const isHotUpdate = latestVersion && semver.gt(latestVersion, currentVersion);
+    // 整包更新
+    const forceUpdate = allVersion && semver.gt(allVersion, currentVersion);
+    let resData = {
+      update: false,
+      wgtUrl: '',
+      pkgUrl: '',
+      platform,
+      latestVersion,
+    };
+    if (forceUpdate) {
+      resData = {
+        update: true,
+        wgtUrl: '',
+        pkgUrl: '',
+        platform,
+        latestVersion,
+      };
+    } else if (isHotUpdate) {
+      resData = {
+        update: true,
+        wgtUrl: 'http://192.168.3.9:7001/static/__UNI__3594730.wgt',
+        pkgUrl: '',
+        platform,
+        latestVersion,
+      };
+    }
+
+    ctx.body = resJson.success({
+      msg: '请求成功!',
+      code: HttpStatus.SUCCESS,
+      data: resData,
+    });
   }
 
   @request('get', '/banner')

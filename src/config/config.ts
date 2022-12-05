@@ -13,7 +13,7 @@ export interface Config {
 const isDevMode = process.env.NODE_ENV == 'development';
 
 const config: Config = {
-  port: +(process.env.PORT || 8001),
+  port: +(process.env.PORT || 7001),
   debugLogging: isDevMode,
   dbsslconn: !isDevMode,
   jwtSecret: process.env.JWT_SECRET || 'your-secret-whatever',

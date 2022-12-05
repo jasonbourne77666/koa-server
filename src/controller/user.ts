@@ -20,7 +20,7 @@ export default class UserController {
   @summary('register user')
   @body(userSchema)
   public static async register(ctx: Context): Promise<void> {
-    const { username, password, email, phone, birth, sex, captcha } = ctx.request.body;
+    const { username, password, email, phone, birth, sex, captcha } = ctx.request.body as any;
     const sessionCaptcha = ctx.session?.captcha ?? '';
 
     const body = new validatorUser();
@@ -111,7 +111,7 @@ export default class UserController {
    * 登录
    */
   public static async login(ctx: Context): Promise<void> {
-    const { username, password, captcha } = ctx.request.body;
+    const { username, password, captcha } = ctx.request.body as any;
     const sessionCaptcha = ctx.session?.captcha ?? '';
 
     const body = new validatorLogin();

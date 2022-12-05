@@ -50,7 +50,7 @@ app.use(bodyParser());
 
 app.use(
   staticCache(path.join(__dirname, '../public'), {
-    // prefix: '/public'
+    prefix: '/static',
   })
 );
 app.use(session({ maxAge: 24 * 60 * 60 * 1000 }, app));
