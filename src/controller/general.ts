@@ -13,8 +13,20 @@ export default class GeneralController {
     ctx.body = 'Hello World!';
   }
 
+  // 测试jsonp
+  @request('get', '/api/jsonp')
+  @summary('Welcome page')
+  @description('A simple welcome message to test jsonp.')
+  public static async testJsonp(ctx: BaseContext): Promise<void> {
+    let { wd, callback } = ctx.query;
+    console.log(wd);
+    console.log(callback);
+    ctx.body = `${callback}('Hello World!')`;
+  }
+
+  // 测试uniapp 版本迭代
   @request('get', '/version')
-  @summary('get version')
+  @summary('Welcome page')
   @description('get versions for app')
   public static async getVersion(ctx: Context): Promise<void> {
     const latestVersion = '1.0.1';
@@ -57,6 +69,7 @@ export default class GeneralController {
     });
   }
 
+  // 普通get请求
   @request('get', '/banner')
   @summary('Welcome page')
   @description('A simple welcome message to verify the service is up and running.')

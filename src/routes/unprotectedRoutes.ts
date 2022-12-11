@@ -12,6 +12,7 @@ unprotectedRouter.get('/api/captcha', user.captcha);
 // unprotectedRouter.get('/api/', general.helloWorld);
 unprotectedRouter.get('/api/banner', general.getBanner);
 unprotectedRouter.get('/api/version', general.getVersion);
+unprotectedRouter.get('/api/jsonp', general.testJsonp);
 unprotectedRouter.get('/api/banner-detail/:id', general.bannerDetail);
 
 export { unprotectedRouter };
