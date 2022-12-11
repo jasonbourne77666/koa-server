@@ -7,4 +7,4 @@ services:
     image: my-server
     container_name: my-server # docker容器的名字
     ports:
-      - 8929:8001
+      - 8929:7001
